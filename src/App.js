@@ -1,28 +1,55 @@
-import './App.css';
+import { useState } from "react";
+import { BrowserRouter as Router,Routes,Route } from "react-router-dom";
+import Basket from "./Basket";
+import { Header } from "./Components/Header";
+import { Main } from "./Components/Main";
+import data from "./data";
 
 function App() {
+const {products}=data
+const [cartItems,setCartItems]=useState([])
+const onAdd=(product)=>{
+  const exist=cartItems.find((x)=>x.id===product.id)
+if(exist){
+setCartItems(
+  cartItems.map((x)=>x.id===product.id?{...exist,qty:exist.qty+1}:x
+  )
+)
+}else{
+setCartItems([...cartItems,{...product,qty:1}])}}
+
+
+const onRemove=(product)=>{
+const exist=cartItems.find((x)=>x.id===product.id)
+if(exist.qty==1){
+  setCartItems(cartItems.filter((x)=>x.id !== product.id))
+}
+else{
+ setCartItems(
+cartItems.map((x)=>x.id===product.id?{...exist,qty:exist.qty-1}:x)
+
+ )
+
+  
+}
+
+}
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src="Octocat.png" className="App-logo" alt="logo" />
-        <p>
-          GitHub Codespaces <span className="heart">♥️</span> React
-        </p>
-        <p className="small">
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </p>
-      </header>
-    </div>
+<div>
+<Router>
+<Header   countCartItems={cartItems.length} />
+<Routes>
+<Route path="/header" element={<Header    />} />
+
+<Route path="/" element={<Main onAdd={onAdd} products={products} />} />
+<Route path="/basket" element={<Basket
+onAdd={onAdd} 
+onRemove={onRemove} 
+cartItems={cartItems}/>}/> 
+</Routes>
+
+</Router>
+</div>
   );
 }
 
